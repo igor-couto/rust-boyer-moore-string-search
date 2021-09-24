@@ -1,0 +1,6 @@
+[package]
+edition = "2018"
+name = "boyer-moore-string-search"
+version = "0.1.0"
+
+[dependencies]
