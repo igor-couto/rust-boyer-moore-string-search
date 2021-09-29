@@ -7,7 +7,8 @@ fn main() {
 
     let bad_match_table = pre_process_pattern(&pattern);
 
-    let result = search(&bad_match_table, &text_bytes);
+    let result = search(&bad_match_table, &pattern, &text_bytes);
+    println!("The result is: {}", result);
 }
 
 fn pre_process_pattern(pattern: &[u8]) -> AHashMap<u8, u8> {
@@ -25,17 +26,24 @@ fn pre_process_pattern(pattern: &[u8]) -> AHashMap<u8, u8> {
     return bad_match_table;
 }
 
-fn search(bad_match_table: &AHashMap<u8, u8>, text: &[u8]) -> u32 {
+fn search(bad_match_table: &AHashMap<u8, u8>, pattern: &[u8], text: &[u8]) -> u32 {
     let mut index = (bad_match_table.get(&('*' as u8)).unwrap() - 1u8) as usize;
-    loop {
+    'text_loop: loop {
         if index >= text.len() {
+            // TODO : return error not found here
             break;
         }
 
-        //  se o caracter do texto for igual ao ultimo do pattern começa uma busca para esquerda no pattern
-        //  até dar match compelto
-        //  em caso de mismatch
-        // consultar tabela e andar para a direita o numero de vezes indicado por value
+        for pattern_index in (0..pattern.len()).rev() {
+            if text[index] != pattern[pattern_index] {
+                index += match bad_match_table.get(&text[index]) {
+                    Some(value) => *value as usize,
+                    None => *bad_match_table.get(&('*' as u8)).unwrap() as usize,
+                };
+                continue 'text_loop;
+            }
+            return (index - pattern.len()) as u32;
+        }
 
         index += 1;
     }
