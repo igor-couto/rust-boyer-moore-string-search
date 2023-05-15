@@ -45,3 +45,30 @@ fn search(bad_match_table: &AHashMap<u8, usize>, pattern: &[u8], text: &[u8]) ->
     }
     None
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_search() {
+        let pattern: &[u8] = &['w' as u8, 'a' as u8, 'l' as u8, 'k' as u8];
+        let text = String::from("Will you walk into my parlour? said a spider to a fly");
+        let text_bytes = text.as_bytes();
+
+        let bad_match_table = pre_process_pattern(&pattern);
+
+        assert_eq!(search(&bad_match_table, &pattern, &text_bytes), Some(9));
+    }
+
+    #[test]
+    fn test_search_not_found() {
+        let pattern: &[u8] = &['z' as u8, 'z' as u8, 'z' as u8];
+        let text = String::from("Will you walk into my parlour? said a spider to a fly");
+        let text_bytes = text.as_bytes();
+
+        let bad_match_table = pre_process_pattern(&pattern);
+
+        assert_eq!(search(&bad_match_table, &pattern, &text_bytes), None);
+    }
+}
